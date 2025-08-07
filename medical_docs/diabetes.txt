@@ -1,0 +1,18 @@
+Diabetes is a chronic medical condition caused by the body's inability to produce enough insulin or effectively use the insulin it produces. This leads to elevated levels of glucose (sugar) in the blood. The main types of diabetes are Type 1 (autoimmune destruction of insulin-producing cells), Type 2 (insulin resistance and relative insulin deficiency), and gestational diabetes (occurring during pregnancy).
+
+Recommended medicines for diabetes management include:
+- Metformin (commonly first-line for Type 2 diabetes)
+- Sulfonylureas (e.g., glipizide, glyburide)
+- DPP-4 inhibitors (e.g., sitagliptin)
+- GLP-1 receptor agonists (e.g., liraglutide)
+- SGLT2 inhibitors (e.g., empagliflozin)
+- Insulin therapy (essential for Type 1 diabetes and sometimes for advanced Type 2 diabetes)
+
+If blood sugar levels do not reduce with standard medications and lifestyle changes (diet, exercise), further steps may include:
+- Intensifying insulin therapy or adding additional injectable medications
+- Reviewing and optimizing medication dosages
+- Consulting an endocrinologist for specialized care
+- Assessing for complications or other underlying conditions affecting blood sugar control
+- Considering advanced therapies such as insulin pumps or continuous glucose monitoring systems
+
+Regular monitoring and follow-up with healthcare professionals are essential for effective diabetes management.
