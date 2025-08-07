@@ -1,4 +1,11 @@
-flask
-google-generativeai
-faiss-cpu
-sentence-transformers
+flask==2.3.3
+google-generativeai==0.3.2
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+speechrecognition==3.10.0
+pydub==0.25.1
+torch>=2.0.0
+transformers>=4.21.0
+safetensors>=0.3.0
+numpy>=1.21.0
+requests==2.31.0

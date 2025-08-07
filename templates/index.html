@@ -4,14 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medical Assistant</title>
-  <script src="{{ url_for('static', filename='recorder.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h2>Medical Diagnosis Assistant</h2>
-  <button id="recordBtn">🎤 Record Audio (5 sec)</button>
+  <div class="container">
+    <h1>Medical Diagnosis Assistant</h1>
+    <div class="recording-section">
+      <button id="recordBtn" class="record-button">🎤 Record Audio (5 sec)</button>
+      <div id="status" class="status"></div>
+    </div>
 
-  <h3>Result:</h3>
-  <pre id="result">{{ result or "" }}</pre>
+    <div class="result-section">
+      <h3>Result:</h3>
+      <div id="result" class="result">{{ result or "Click the record button to start diagnosis..." }}</div>
+    </div>
+  </div>
+  
+  <script src="{{ url_for('static', filename='recorder.js') }}"></script>
 </body>
 </html>
-<!DOCTYPE html>
+
+
