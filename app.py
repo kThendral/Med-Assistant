@@ -73,26 +73,29 @@ Important: This is for informational purposes only and should not replace profes
         result = query_gemini(prompt)
         logger.info("Generated diagnosis with Gemini")
         
-        # Clean up temporary file
+        # Clean up temporary files
         try:
-            os.remove(filepath)
-            if os.path.exists("temp.wav"):
-                os.remove("temp.wav")
-        except:
-            pass
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            if os.path.exists("temp_converted.wav"):
+                os.remove("temp_converted.wav")
+            logger.info("Temporary files cleaned up successfully")
+        except Exception as cleanup_error:
+            logger.warning(f"Could not clean up temporary files: {cleanup_error}")
             
         return result
         
     except Exception as e:
         logger.error(f"Error processing audio: {str(e)}")
-        # Clean up any temporary files
+        # Clean up any temporary files in error case
         try:
             if os.path.exists("temp_audio.wav"):
                 os.remove("temp_audio.wav")
-            if os.path.exists("temp.wav"):
-                os.remove("temp.wav")
-        except:
-            pass
+            if os.path.exists("temp_converted.wav"):
+                os.remove("temp_converted.wav")
+            logger.info("Temporary files cleaned up after error")
+        except Exception as cleanup_error:
+            logger.warning(f"Could not clean up temporary files after error: {cleanup_error}")
         return f"Error processing your request: {str(e)}", 500
 
 @app.errorhandler(404)

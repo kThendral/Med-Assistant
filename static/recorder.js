@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
+    let recordingStream = null;
+    let recordingTimeout = null;
     
     const recordBtn = document.getElementById("recordBtn");
     const statusDiv = document.getElementById("status");
@@ -13,9 +15,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    // Function to stop recording
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+        }
+        if (recordingTimeout) {
+            clearTimeout(recordingTimeout);
+            recordingTimeout = null;
+        }
+    }
+    
     recordBtn.onclick = async () => {
+        // If currently recording, stop the recording
         if (isRecording) {
-            return; // Prevent multiple recordings
+            stopRecording();
+            return;
         }
         
         try {
@@ -27,8 +42,20 @@ document.addEventListener('DOMContentLoaded', function() {
             recordBtn.disabled = true;
             audioChunks = []; // Reset chunks
             
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
+            recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // Try to use a more compatible audio format
+            let mimeType = 'audio/webm';
+            if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                mimeType = 'audio/webm;codecs=opus';
+            } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+                mimeType = 'audio/wav';
+            } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+                mimeType = 'audio/ogg';
+            }
+            
+            console.log(`Using MIME type: ${mimeType}`);
+            mediaRecorder = new MediaRecorder(recordingStream, { mimeType: mimeType });
             
             mediaRecorder.ondataavailable = (e) => {
                 if (e.data.size > 0) {
@@ -41,9 +68,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusDiv.textContent = "Processing audio...";
                 
                 try {
-                    const blob = new Blob(audioChunks, { type: "audio/wav" });
+                    const blob = new Blob(audioChunks, { type: mimeType });
                     const formData = new FormData();
-                    formData.append("audio", blob, "recording.wav");
+                    
+                    // Use appropriate file extension based on MIME type
+                    let fileName = "recording.webm";
+                    if (mimeType.includes('wav')) {
+                        fileName = "recording.wav";
+                    } else if (mimeType.includes('ogg')) {
+                        fileName = "recording.ogg";
+                    }
+                    
+                    formData.append("audio", blob, fileName);
+                    console.log(`Sending audio file: ${fileName} with type: ${mimeType}`);
                     
                     const response = await fetch("/upload", {
                         method: "POST",
@@ -63,10 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     statusDiv.textContent = "Error occurred";
                 } finally {
                     recordBtn.disabled = false;
-                    recordBtn.textContent = "🎤 Record Audio (5 sec)";
+                    recordBtn.textContent = "🎤 Record Audio";
                     
                     // Stop all tracks to release microphone
-                    stream.getTracks().forEach(track => track.stop());
+                    if (recordingStream) {
+                        recordingStream.getTracks().forEach(track => track.stop());
+                        recordingStream = null;
+                    }
                 }
             };
             
@@ -74,26 +114,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("MediaRecorder error:", e);
                 statusDiv.textContent = "Recording error occurred";
                 recordBtn.disabled = false;
+                recordBtn.textContent = "🎤 Record Audio";
                 isRecording = false;
+                
+                // Clean up stream
+                if (recordingStream) {
+                    recordingStream.getTracks().forEach(track => track.stop());
+                    recordingStream = null;
+                }
             };
             
             mediaRecorder.start();
             isRecording = true;
-            recordBtn.textContent = "🔴 Recording...";
-            statusDiv.textContent = "Recording in progress...";
-            
-            // Auto stop after 5 seconds
-            setTimeout(() => {
-                if (mediaRecorder && mediaRecorder.state === "recording") {
-                    mediaRecorder.stop();
-                }
-            }, 5000);
+            recordBtn.disabled = false; // Enable button so it can be used to stop
+            recordBtn.textContent = "⏹️ Stop Recording";
+            statusDiv.textContent = "Recording... Click stop to finish";
             
         } catch (error) {
             console.error("Error starting recording:", error);
             statusDiv.textContent = `Error: ${error.message}`;
             recordBtn.disabled = false;
+            recordBtn.textContent = "🎤 Record Audio";
             isRecording = false;
+            
+            // Clean up stream in case of error
+            if (recordingStream) {
+                recordingStream.getTracks().forEach(track => track.stop());
+                recordingStream = null;
+            }
         }
     };
+    
+    // Optional: Add keyboard shortcut to stop recording (Escape key)
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && isRecording) {
+            console.log("Recording stopped by Escape key");
+            stopRecording();
+        }
+    });
 });
