@@ -1,11 +1,41 @@
-flask==2.3.3
-google-generativeai==0.3.2
-faiss-cpu==1.7.4
-sentence-transformers==2.2.2
-speechrecognition==3.10.0
+# Web Framework
+flask==3.0.0
+# Used in: app.py - Main web application framework
+
+# AI/ML Libraries
+google-generativeai==0.8.0
+# Used in: gemini_helper.py - Google Gemini AI for medical diagnosis generation
+
+sentence-transformers==3.0.1
+# Used in: retriever.py - Text embedding for semantic search of medical documents
+
+torch==2.3.0
+# Used by: sentence-transformers (dependency) - Deep learning framework
+
+transformers==4.44.0
+# Used by: sentence-transformers (dependency) - Transformer models
+
+huggingface-hub==0.24.0
+# Used by: sentence-transformers (dependency) - Model hub integration
+
+# Vector Search
+faiss-cpu==1.8.0
+# Used in: retriever.py - Fast similarity search for finding relevant medical documents
+
+# Audio Processing
+speechrecognition==3.10.4
+# Used in: transcriber.py - Speech-to-text conversion
+
 pydub==0.25.1
-torch>=2.0.0
-transformers>=4.21.0
-safetensors>=0.3.0
-numpy>=1.21.0
-requests==2.31.0
+# Used in: transcriber.py - Audio file format conversion and processing
+
+# Data Processing
+numpy==1.26.4
+# Used in: retriever.py - Array operations for embeddings and FAISS
+
+# Utility Libraries
+requests==2.32.3
+# Used by: Various libraries as dependency - HTTP requests
+
+# Optional: For better audio processing (requires FFmpeg installation)
+# ffmpeg-python==0.2.0
