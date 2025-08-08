@@ -3,20 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medical Assistant</title>
+  <title>Medical Assistant - Prescription & Report Generator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
-    <h1>Medical Diagnosis Assistant</h1>
+    <h1>Medical Assistant</h1>
+    <h2>Doctor-Patient Conversation Analysis</h2>
+    <p class="description">Record doctor-patient conversations to automatically generate prescriptions and medical reports</p>
+    
     <div class="recording-section">
-      <button id="recordBtn" class="record-button">🎤 Record Audio</button>
+      <button id="recordBtn" class="record-button">🎤 Record Conversation</button>
       <div id="status" class="status"></div>
+      <div class="instructions">
+        <p><strong>Instructions:</strong></p>
+        <ul>
+          <li>Click to start recording the doctor-patient conversation</li>
+          <li>Speak clearly and ensure both doctor and patient voices are audible</li>
+          <li>Click stop when the conversation is complete</li>
+          <li>The system will generate a prescription and medical report</li>
+        </ul>
+      </div>
     </div>
 
     <div class="result-section">
-      <h3>Result:</h3>
-      <div id="result" class="result">{{ result or "Click the record button to start diagnosis..." }}</div>
+      <h3>Generated Prescription & Report:</h3>
+      <div id="result" class="result">{{ result or "Click the record button to start recording a doctor-patient conversation..." }}</div>
+      
+      <!-- PDF Generation Section -->
+      <div id="pdf-section" class="pdf-section" style="display: none;">
+        <h4>Generate PDF Report</h4>
+        <div class="pdf-form">
+          <div class="form-group">
+            <label for="patientName">Patient Name:</label>
+            <input type="text" id="patientName" placeholder="Enter patient name" />
+          </div>
+          <div class="form-group">
+            <label for="doctorName">Doctor Name:</label>
+            <input type="text" id="doctorName" placeholder="Enter doctor name" />
+          </div>
+          <button id="generatePdfBtn" class="pdf-button">📄 Create PDF Report</button>
+        </div>
+        <div id="pdf-status" class="pdf-status"></div>
+      </div>
     </div>
   </div>
   

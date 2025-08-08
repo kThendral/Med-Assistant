@@ -5,10 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let isRecording = false;
     let recordingStream = null;
     let recordingTimeout = null;
+    let currentSessionId = null;
     
     const recordBtn = document.getElementById("recordBtn");
     const statusDiv = document.getElementById("status");
     const resultDiv = document.getElementById("result");
+    const pdfSection = document.getElementById("pdf-section");
+    const generatePdfBtn = document.getElementById("generatePdfBtn");
+    const patientNameInput = document.getElementById("patientName");
+    const doctorNameInput = document.getElementById("doctorName");
+    const pdfStatusDiv = document.getElementById("pdf-status");
     
     if (!recordBtn) {
         console.error("Record button not found!");
@@ -91,16 +97,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(`Server error: ${response.status}`);
                     }
                     
-                    const result = await response.text();
-                    resultDiv.innerHTML = result.replace(/\n/g, '<br>');
-                    statusDiv.textContent = "Analysis complete!";
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        resultDiv.innerHTML = result.report.replace(/\n/g, '<br>');
+                        statusDiv.textContent = "Analysis complete!";
+                        
+                        // Store session ID and show PDF generation section
+                        currentSessionId = result.session_id;
+                        pdfSection.style.display = 'block';
+                        pdfStatusDiv.textContent = '';
+                    } else {
+                        throw new Error('Server returned error response');
+                    }
                 } catch (error) {
                     console.error("Upload error:", error);
                     resultDiv.textContent = `Error: ${error.message}`;
                     statusDiv.textContent = "Error occurred";
                 } finally {
                     recordBtn.disabled = false;
-                    recordBtn.textContent = "🎤 Record Audio";
+                    recordBtn.textContent = "🎤 Record Conversation";
                     
                     // Stop all tracks to release microphone
                     if (recordingStream) {
@@ -114,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error("MediaRecorder error:", e);
                 statusDiv.textContent = "Recording error occurred";
                 recordBtn.disabled = false;
-                recordBtn.textContent = "🎤 Record Audio";
+                recordBtn.textContent = "🎤 Record Conversation";
                 isRecording = false;
                 
                 // Clean up stream
@@ -134,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("Error starting recording:", error);
             statusDiv.textContent = `Error: ${error.message}`;
             recordBtn.disabled = false;
-            recordBtn.textContent = "🎤 Record Audio";
+            recordBtn.textContent = "🎤 Record Conversation";
             isRecording = false;
             
             // Clean up stream in case of error
@@ -142,6 +158,58 @@ document.addEventListener('DOMContentLoaded', function() {
                 recordingStream.getTracks().forEach(track => track.stop());
                 recordingStream = null;
             }
+        }
+    };
+    
+    // PDF Generation functionality
+    generatePdfBtn.onclick = async () => {
+        if (!currentSessionId) {
+            pdfStatusDiv.textContent = 'Error: No session data available. Please record a conversation first.';
+            pdfStatusDiv.style.color = 'red';
+            return;
+        }
+        
+        const patientName = patientNameInput.value.trim();
+        const doctorName = doctorNameInput.value.trim();
+        
+        try {
+            generatePdfBtn.disabled = true;
+            generatePdfBtn.textContent = '⏳ Generating PDF...';
+            pdfStatusDiv.textContent = 'Generating PDF report...';
+            pdfStatusDiv.style.color = 'blue';
+            
+            const response = await fetch('/generate_pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    session_id: currentSessionId,
+                    patient_name: patientName,
+                    doctor_name: doctorName
+                }),
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                pdfStatusDiv.innerHTML = `
+                    <span style="color: green;">✅ PDF generated successfully!</span><br>
+                    <a href="/download_pdf/${result.pdf_path}" download class="download-link">
+                        📥 Download PDF Report
+                    </a>
+                `;
+            } else {
+                throw new Error(result.error || 'Failed to generate PDF');
+            }
+            
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            pdfStatusDiv.textContent = `Error: ${error.message}`;
+            pdfStatusDiv.style.color = 'red';
+        } finally {
+            generatePdfBtn.disabled = false;
+            generatePdfBtn.textContent = '📄 Create PDF Report';
         }
     };
     

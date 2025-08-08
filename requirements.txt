@@ -33,6 +33,10 @@ pydub==0.25.1
 numpy==1.26.4
 # Used in: retriever.py - Array operations for embeddings and FAISS
 
+# PDF Generation
+reportlab==4.0.4
+# Used in: app.py - PDF generation for medical reports
+
 # Utility Libraries
 requests==2.32.3
 # Used by: Various libraries as dependency - HTTP requests
