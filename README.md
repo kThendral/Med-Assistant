@@ -106,11 +106,13 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## 👩‍💻 Author
 
-**\Thendral Kabilan**
+**Thendral Kabilan**
 [GitHub Profile](https://github.com/Thendralk)
 [LinkedIn](www.linkedin.com/in/thendral-kabilan)
-**\Somnath Umapathi**
+
+**Somnath Umapathi**
 [GitHub Profile](https://github.com/Somnathumapathi)
 [LinkedIn](https://www.linkedin.com/in/somnath-umapathi-9a485a205/)
+
 
 
